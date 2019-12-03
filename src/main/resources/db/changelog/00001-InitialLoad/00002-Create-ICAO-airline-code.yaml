@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 00002
+      author: kevin
+      changes:
+        - createTable:
+            tableName: icao_airlinecode
+            columns:
+              - column:
+                  name: icao_code
+                  type: char(4)
+                  constraints:
+                    primaryKey: true
+                    nullable: false

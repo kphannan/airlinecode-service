@@ -1,0 +1,11 @@
+
+
+
+partner-services:
+  services:
+    - name: service1
+      hostname: host1.some.domain
+      health-endpoint: /health
+
+    - name: service2
+      hostname: host2.some.domain
