@@ -1,0 +1,45 @@
+
+application:
+  channel-id: foo-chan
+  application-id: foo-app
+
+partner-services:
+  foo: "some named foo"
+  application-id: bar-app
+  channel-id: bar-chan
+
+  services:
+    - name: service11
+      host: host11.some.domain
+      health-endpoint: /health
+      client-policy:
+        timeout: 12
+        max-retries: 2
+        max-elapsed-time: 31
+        use-async-strategy: true
+
+    - name: service12
+      host: host12.some.domain
+
+  soap-services:
+    - name: soap1
+      host: soap1.some.domain
+      port: 1234
+      client-policy:
+        timeout: 10
+        max-retries: 3
+        max-elapsed-time: 30
+
+    - name: soap2
+      host: soap2.some.domain
+      port: 4321
+      # security:
+      certificate:
+        keystore-filename: cert2.jks
+        username: ksusername2
+        password: kspassword2
+      client-policy:
+        timeout: 12
+        max-retries: 2
+        max-elapsed-time: 31
+        use-async-strategy: false

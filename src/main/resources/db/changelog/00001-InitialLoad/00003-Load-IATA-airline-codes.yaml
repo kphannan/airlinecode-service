@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 00003
+      author: kevin
+      changes:
+        - loadData:
+            tableName: iata_airlinecode
+            columns:
+              - column:
+                  name: iata_code
+                  type: string
+            relativeToChangelogFile: true
+            file: data/iata-airline-codes.csv

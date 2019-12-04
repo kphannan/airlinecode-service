@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 00001
+      author: kevin
+      changes:
+        - createTable:
+            tableName: iata_airlinecode
+            columns:
+              - column:
+                  name: iata_code
+                  type: char(3)
+                  constraints:
+                    primaryKey: true
+                    nullable: false

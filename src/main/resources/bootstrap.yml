@@ -1,0 +1,119 @@
+server:
+  port: ${port:8110}
+
+datasource:
+  username: sa
+  password: sa
+  # schema: something
+  url: jdbc:h2:mem:testdb;MODE=Mysql;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;
+  driver:
+    classname: org.h2.Driver
+
+##### Spring #####
+spring:
+  application:
+    name: airline-code-service
+
+  profiles:
+    active: ${active_profiles:local}
+
+  cloud:
+    configs:
+      uri: http://localhost:8080
+      enabled: false
+
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  jpa:
+    show-sql: true
+      
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  ## --- DataSource ---
+  datasource:
+    driver-class-name: ${datasource.driver.classname}
+    url: ${datasource.url}
+    username: ${datasource.username}
+    password: ${datasource.password}
+  # h2:
+  #   console:
+  #     enabled: truel
+
+##### Rendezvous service (Eureka) #####
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+##### Logging configuration #####
+logging:
+  level:
+    root: INFO
+
+    com:
+      airline: DEBUG
+
+    org:
+      apache: ERROR
+
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            # Enable logging of SQL
+            sql: trace
+
+      springframework:  info
+        # boot: debug
+        # beans: debug
+
+      liquibase: info
+
+
+# Metrics related configurations
+management:
+  endpoint:
+    health:
+      show-details: always
+      status:
+        order: fatal,down,out-of-service,degraded,unknown,up
+        http-mapping:
+          degraded: 242
+          unknown: 242
+          fatal: 503
+          down: 503
+          out-of-service: 503
+
+    liquibase:
+      enabled: true
+
+    metrics:
+      enabled: true
+
+    prometheus:
+      enabled: true
+
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: '*'
+
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# {"git":{"commit":{"time":"2019-11-23T23:41:52Z","id":"5b27927"},"branch":"development"}}
+info:
+  app:
+    name: ${spring.application.name}
+    version: ${project.version}
+    java:
+      version: ${java.version}
+
+
+

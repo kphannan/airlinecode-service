@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - include:
+      relativeToChangelogFile: true
+      file: 00001-InitialLoad/00001-changelog-master.yaml
+
+  # - includeAll:
+  #     path: changes
+  #     relativeToChangelogFile: true
