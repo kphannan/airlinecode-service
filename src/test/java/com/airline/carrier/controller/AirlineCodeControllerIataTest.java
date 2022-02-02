@@ -56,7 +56,7 @@ public class AirlineCodeControllerIataTest
     @BeforeEach
     public void setup()
     {
-        mvc = MockMvcBuilders.standaloneSetup(service)
+        mvc = MockMvcBuilders.standaloneSetup( service )
                 // .setControllerAdvice(new SuperHeroExceptionHandler())
                 // .addFilters(new SuperHeroFilter())
                 .build();
@@ -69,7 +69,7 @@ public class AirlineCodeControllerIataTest
     {
         final IATAAirlineDesignator airlineCode = new IATAAirlineDesignator( "1Z" );
 
-        given( repository.findById("1Z")).willReturn( Optional.of( new AirlineCodeIata( airlineCode.getAirlineCode() )));
+        given( repository.findById( "1Z" ) ).willReturn( Optional.of( new AirlineCodeIata( airlineCode.getAirlineCode() ) ) );
 
         final MockHttpServletResponse response = mvc.perform(
             get("/airline/iata/{id}", airlineCode.getAirlineCode() )
@@ -86,11 +86,12 @@ public class AirlineCodeControllerIataTest
     {
         given( repository.findById("DV")).willReturn( Optional.ofNullable( null ));
 
-        final MockHttpServletResponse response = mvc.perform(
-            get("/airline/iata/{id}", "DV" )
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isNotFound() )
-            .andReturn().getResponse();
+        final MockHttpServletResponse response =
+            mvc.perform( get( "/airline/iata/{id}", "DV" )
+                            .accept( MediaType.APPLICATION_JSON ) )
+                .andExpect( status().isNotFound() )
+                .andReturn()
+                .getResponse();
     }
 
 
@@ -101,12 +102,13 @@ public class AirlineCodeControllerIataTest
     {
         given( repository.findAll()).willReturn( Collections.emptyList());
 
-        final MockHttpServletResponse response = mvc.perform(
-            get("/airline/iata" ))
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isOk() )
-            .andExpect(content().json("[]"))
-            .andReturn().getResponse();
+        final MockHttpServletResponse response =
+            mvc.perform( get( "/airline/iata" ) )
+                .andDo( MockMvcResultHandlers.print() )
+                .andExpect( status().isOk() )
+                .andExpect( content().json( "[]") )
+                .andReturn()
+                .getResponse();
     }
 
 
@@ -123,7 +125,7 @@ public class AirlineCodeControllerIataTest
                   .stream()
                   .map( a -> new AirlineCodeIata( a ))
                   .collect(Collectors.toList());
-        
+
         given( repository.findAll()).willReturn( listOfIataAirlineCodes );
 
         final MockHttpServletResponse response = mvc.perform(
@@ -183,9 +185,9 @@ public class AirlineCodeControllerIataTest
         final MockHttpServletResponse response = mvc.perform(
             post("/airline/iata" )
                 // .content(iataAirlineCode)
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept( MediaType.APPLICATION_JSON ))
+                .content( json )
+                .contentType( MediaType.APPLICATION_JSON )
+                .accept( MediaType.APPLICATION_JSON ) )
             .andExpect(status().isCreated() )
             // .andExpect( jsonPath("$.iataAirlineCode", equalTo( "LH")))
             .andReturn().getResponse();
@@ -204,15 +206,15 @@ public class AirlineCodeControllerIataTest
 
         given( repository.save( iata ))
             .willReturn( iata );
-        given( repository.findById(iata.getIataCode()))
-            .willReturn( Optional.of( iata ));
+        given( repository.findById( iata.getIataCode() ) )
+            .willReturn( Optional.of( iata ) );
 
         final MockHttpServletResponse response = mvc.perform(
             put("/airline/iata/{id}", iataAirlineCode.getAirlineCode() )
                 // .content(iataAirlineCode)
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept( MediaType.APPLICATION_JSON ))
+                .content( json )
+                .contentType( MediaType.APPLICATION_JSON )
+                .accept( MediaType.APPLICATION_JSON ) )
             .andExpect(status().isOk() )
             // .andExpect( jsonPath("$.iataAirlineCode", equalTo( "DL")))
             .andReturn().getResponse();
@@ -225,22 +227,23 @@ public class AirlineCodeControllerIataTest
         final String json = "{ \"iataAirlineCode\": \"GH\"}";
 
         AirlineCodeIata iata = new AirlineCodeIata( "GH" );
-        IATAAirlineDesignator iataAirlineCode = new IATAAirlineDesignator("GH");
+        IATAAirlineDesignator iataAirlineCode = new IATAAirlineDesignator( "GH" );
 
-        given( repository.findById(iata.getIataCode()))
-            .willReturn( Optional.ofNullable(null));
-        given( repository.save( iata ))
+        given( repository.findById(iata.getIataCode() ) )
+            .willReturn( Optional.ofNullable( null ) );
+        given( repository.save( iata ) )
             .willReturn( iata );
 
         final MockHttpServletResponse response = mvc.perform(
             put("/airline/iata/{id}", iataAirlineCode.getAirlineCode() )
                 // .content(iataAirlineCode)
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept( MediaType.APPLICATION_JSON ))
+                .content( json )
+                .contentType( MediaType.APPLICATION_JSON )
+                .accept( MediaType.APPLICATION_JSON ) )
             .andExpect(status().isCreated() )
             // .andExpect( jsonPath("$.iataAirlineCode", equalTo( "GH")))
-            .andReturn().getResponse();
+            .andReturn()
+            .getResponse();
     }
 
 
@@ -251,27 +254,27 @@ public class AirlineCodeControllerIataTest
         final String json = "{ \"iataAirlineCode\": \"LX\"}";
 
         AirlineCodeIata iata = new AirlineCodeIata( "ZZ" );
-        IATAAirlineDesignator iataAirlineCode = new IATAAirlineDesignator(iata.getIataCode());
+        IATAAirlineDesignator iataAirlineCode = new IATAAirlineDesignator( iata.getIataCode() );
 
-        given( repository.findById(iata.getIataCode()))
-            .willReturn( Optional.ofNullable(null));
-        given( repository.save( iata ))
+        given( repository.findById( iata.getIataCode() ) )
+            .willReturn( Optional.ofNullable( null ) );
+        given( repository.save( iata ) )
             .willReturn( iata );
 
-        final MockHttpServletResponse response = mvc.perform(
-            put("/airline/iata/{id}", iataAirlineCode.getAirlineCode() )
-                // .content(iataAirlineCode)
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isBadRequest() )
-            .andReturn().getResponse();
+        final MockHttpServletResponse response =
+            mvc.perform( put("/airline/iata/{id}", iataAirlineCode.getAirlineCode() )
+                            // .content(iataAirlineCode)
+                            .content( json )
+                            .contentType( MediaType.APPLICATION_JSON )
+                            .accept( MediaType.APPLICATION_JSON ) )
+                .andExpect( status().isBadRequest() )
+                .andReturn()
+                .getResponse();
     }
 
 
 
 }
 
- 
- 
- 
+
+

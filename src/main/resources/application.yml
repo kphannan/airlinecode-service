@@ -9,3 +9,9 @@ partner-services:
 
     - name: service2
       hostname: host2.some.domain
+
+
+spring:
+  config:
+    import: "optional:configserver:http://localhost:8888"
+

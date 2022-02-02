@@ -1,243 +1,207 @@
 
 buildscript {
     ext {
-        lombokVersion      = '1.18.8'
-        junitVersion       = '5.5.2'
-        hamcrestVersion    = '2.2'
-        serenityVersion    = '2.0.83'
-        checkstyleVersion  = '8.26'
-		karateVersion      = '0.9.5.RC4'
-		micrometerVersion  = '1.3.1'
+        // --- Languages / framworks
+        lombokVersion              = '1.18.22'
+        apacheLangVersion          = '3.12.0'
+        hibernateValidatorVersion  = '7.0.2.Final'
+        jacksonVersion             = '2.10.1'
+
+        // --- Testing ---
+        // --- unit testing
+        junitVersion               = '5.8.2'
+        hamcrestVersion            = '2.2'
+        serenityVersion            = '2.0.83'
+        cucumberReportsVersion     = '4.11.2'
+
+
+        // ===== Quality checks =====
+        // --- Coding practies (static analysis) ---
+        // --- Coding style
+        checkstyleVersion          = '9.0.1'
+        // --- Common Coding flaws
+        pmdVersion                 = '6.41.0'
+
+        // --- Testing ---
+        // Unit testing
+        junitVersion               = '5.8.2'
+        // --- Code coverage
+        pitVersion                 = '1.7.3'
+
+        // --- Documentation ---
+        asciiDoctorVersion         = '1.5.6'
     }
 
     repositories {
         mavenLocal()
-        jcenter()
     }
 
     dependencies {
         classpath("net.serenity-bdd:serenity-gradle-plugin:${serenityVersion}")
-        // classpath 'org.liquibase:liquibase-gradle-plugin:2.0.0'
+        classpath 'be.jlr-home.gradle:plantumlPlugin:0.1.+'
     }
 }
 
-
 plugins {
-	id 'org.springframework.boot' version '2.2.2.BUILD-SNAPSHOT'
-	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-	id 'org.asciidoctor.convert' version '1.5.8'
-	id 'java'
+    // --- Artifact
+    id 'java'
+
+    // --- annotation processors
+    // id "io.freefair.lombok" version "6.3.0"
+    // id "io.freefair.lombok"
+
+    // ===== Frameworks =====
+    // --- Spring boot
+    id 'org.springframework.boot' version '2.6.1'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+
+
+    // ===== Quality Assurance =====
+    // --- Static Analysis
+    // --- PMD
+    id 'pmd'
+    // --- Style
+    id 'checkstyle'
+    // --- Coverage
     id 'jacoco'
-    // id 'checkstyle'
+    // --- Mutation testing
+    // id 'info.solidsoft.pitest' version '1.7.0'
+    // id 'info.solidsoft.pitest'
+
+
+    // ===== Configuration Management =====
+    // id "net.nemerosa.versioning" version "2.9.0"
+    // id "com.gorylenko.gradle-git-properties" version "2.3.2"
+    // id 'maven-publish'
+
+    // ===== Documentation =====
+    // id 'org.asciidoctor.convert' version '1.5.8'
+    // id 'org.asciidoctor.convert'
+
     id 'project-report'
     id 'build-dashboard'
     // id 'net.serenity-bdd.aggregator' version "${serenityVersion}"
-    // id "net.nemerosa.versioning" version "2.9.0"
-    // id "net.nemerosa.versioning"
-    // id "com.gorylenko.gradle-git-properties" version "2.2.0"
-	// id 'org.liquibase.gradle' version '2.0.0'
+
 }
 
-// apply plugin: 'net.serenity-bdd.aggregator'
-
-
-group = 'com.airline'
+group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
-targetCompatibility = "${sourceCompatibility}"
+sourceCompatibility = '17'
 
 configurations {
-	developmentOnly
-	runtimeClasspath {
-		extendsFrom developmentOnly
-	}
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	jcenter()
-	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
+    mavenCentral()
 }
 
 ext {
-	set('snippetsDir', file("build/generated-snippets"))
-	set('springCloudVersion', "Hoxton.BUILD-SNAPSHOT")
+    set( 'snippetsDir', file( "build/generated-snippets" ) )
+    set( 'springCloudVersion', "2021.0.0" )
 }
-
-def changeLog = "$projectDir/src/main/resources/db/changelog/db.changelog-master.yaml"
-
-// liquibase {
-//     activities {
-//         main {
-//             changeLogFile changeLog
-//             url 'jdbc:mysql://127.0.0.1:8889/railcar?serverTimezone=UTC'
-//             username 'railcaradmin'
-//             password 'railcaradmin'
-//             outputFile 'dbchangelog.txt'
-//         }
-//     }
-// }
-
-configurations {
-    // integrationTest.extendsFrom testImplementation
-    integrationTestImplementation.extendsFrom testImplementation
-    // integrationTestCompile.extendsFrom testCompile
-    // integrationTestRuntime.extendsFrom testRuntime
-}
-
 
 dependencies {
+    implementation project( ":airline-core" )
 
-	implementation project( ":core" )
 
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'com.google.guava:guava:28.0-jre'
 
-    // Use JUnit Jupiter API for testing.
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    // ===== Frameworks =====
+    // --- Spring boot
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
 
-    // Use JUnit Jupiter Engine for testing.
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    // --- Traceability
+    // implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+    // implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
 
-    // https://mvnrepository.com/artifact/org.hamcrest/hamcrest
-    testImplementation("org.hamcrest:hamcrest:${hamcrestVersion}")
+    // implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 
-    testImplementation( "com.intuit.karate:karate-junit5:${karateVersion}" )
-    testImplementation( "com.intuit.karate:karate-apache:${karateVersion}" )
+    // --- Instrumentation
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
+
+    // ===== Persistence =====
+    // implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.liquibase:liquibase-core'
+    // --- Database
+    implementation 'org.liquibase:liquibase-core'
+    runtimeOnly 'com.h2database:h2'
+    // runtimeOnly 'org.postgresql:postgresql'
+
+    // ===== partner services =====
+
+    // implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // --- Stability
+    // implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // --- REST
+    // --- SOAP
+    // --- Metrics
+
+
+    // ===== Language Support =====
+    // --- Lombok
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     testImplementation("org.projectlombok:lombok:${lombokVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
-    // testImplementation("net.serenity-bdd:serenity-core:${serenityVersion}" )
-    // testImplementation("net.serenity-bdd:serenity-junit:${serenityVersion}" )
 
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-	// implementation 'org.springframework.boot:spring-boot-starter-hateoas'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    // ===== Quality Assurance =====
+    // --- Static Analysis
+    // --- PMD
+    // --- Style
+    implementation( "com.puppycrawl.tools:checkstyle:${checkstyleVersion}" )
+    // --- Unit testing
+    testImplementation( "org.junit.jupiter:junit-jupiter-api:${junitVersion}" )
+    testRuntimeOnly( "org.junit.jupiter:junit-jupiter-engine:${junitVersion}" )
+    testImplementation( "org.hamcrest:hamcrest:${hamcrestVersion}" )
+    // --- Coverage
+    // --- Mutation testing
+    testRuntimeOnly( 'org.pitest:pitest-junit5-plugin:0.15' )
+    // --- Reporting
+    // testImplementation( "net.serenity-bdd:serenity-core:${serenityVersion}" )
+    // testImplementation( "net.serenity-bdd:serenity-junit:${serenityVersion}" )
+    testImplementation( "net.masterthought:cucumber-reporting:${cucumberReportsVersion}" )
 
-	implementation 'org.liquibase:liquibase-core'
-
-	implementation 'org.springframework.cloud:spring-cloud-starter'
-	implementation 'org.springframework.cloud:spring-cloud-starter-config'
-	// implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-	// implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix'
-	// implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix-dashboard'
-	// implementation 'org.springframework.cloud:spring-cloud-starter-netflix-zuul'
-	// implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-	// implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-	// implementation 'org.springframework.cloud:spring-cloud-starter-zipkin'
-	// implementation 'org.springframework.data:spring-data-rest-hal-browser'
-
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-	// Performance instrumentation
-	// https://mvnrepository.com/artifact/io.micrometer/micrometer-core
-	implementation( "io.micrometer:micrometer-core:${micrometerVersion}" )
-	// https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
-	implementation( "io.micrometer:micrometer-registry-prometheus:${micrometerVersion}" )
-
-
-
-
-	// runtimeOnly 'mysql:mysql-connector-java'
-    // Database
-    // implementation 'mysql:mysql-connector-java'
-	runtimeOnly 'com.h2database:h2'
-
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
-}
-
-compileJava {
-    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-}
-
-
-processResources {
-	filesMatching('application.properties') {
-    	expand(project.properties)
-	}
-}
-
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }
+
 test {
-	outputs.dir snippetsDir
-    // Use junit platform for unit tests
-	useJUnitPlatform()
+    outputs.dir snippetsDir
+    useJUnitPlatform()
 
-
-    // pull karate options into the runtime
-    systemProperty "karate.options", System.properties.getProperty("karate.options")
-    // pull karate env into the runtime
-    systemProperty "karate.env", System.properties.getProperty("karate.env")
-    // ensure tests are always run
-    outputs.upToDateWhen { false }
-}
-
-sourceSets {
-    integrationTest {
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-        resources {
-            srcDir file('src/integrationTest/java')
-            exclude '**/*.java'
-        }
+    jacoco {
+        excludes = [ '**/AirlineCodeApplication' ]
     }
 }
 
-
-task integrationTest(type: Test) {
-    group 'Verification'
-    description 'runs the integration tests with Cucumber/Selenium/Karate'
-
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath       = sourceSets.integrationTest.runtimeClasspath
-
-    mustRunAfter test
-}
-
-
-integrationTest {
-	useJUnitPlatform()
-    // pull karate options into the runtime
-    systemProperty "karate.options", System.properties.getProperty("karate.options")
-    // pull karate env into the runtime
-    systemProperty "karate.env", System.properties.getProperty("karate.env")
-    // ensure tests are always run
-    outputs.upToDateWhen { false }
-}
-
-asciidoctor {
-	inputs.dir snippetsDir
-	dependsOn test
-}
+// asciidoctor {
+//   inputs.dir snippetsDir
+//   dependsOn test
+// }
 
 
 
 
+
+
+
+// ===== Static Code Analysis =====
+// --- Coverage (Jacoco) ---
 // See this page for options https://reflectoring.io/jacoco/
 jacocoTestCoverageVerification {
     violationRules {
@@ -251,7 +215,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'LINE'
                 value   = 'COVEREDRATIO'
-                minimum = 1.0
+                minimum = 0.75
             }
         }
 
@@ -270,40 +234,68 @@ jacocoTestCoverageVerification {
 }
 
 
-
-// checkstyle {
-//     // assign the latest checkstyle version explicitly
-//     // default version is very old, likes 5.9
-//     toolVersion = "${checkstyleVersion}"
-//     // checkstyle.xml copy from:
-//     // https://raw.githubusercontent.com/checkstyle/checkstyle/checkstyle-8.6/src/main/resources/google_checks.xml
-//     // the version should be as same as plugin version
-//     // configFile = rootProject.file('config/checkstyle/checkstyle.xml')
-//     configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
-// }
-// task Checkstyle(type: Checkstyle) {
-//     // source 'src/main/java'
-//     include '**/*.java'
-//     exclude '**/gen/**'
-//     exclude '**/R.java'
-//     exclude '**/BuildConfig.java'
-
-//     // empty classpath
-//     classpath = rootProject.files()
-// }
-
-// checkstyleMain {
-//     source = 'src/main/java'
-// }
-// checkstyleTest {
-//     source = 'src/test/java'
-// }
-
-
-bootRun {
-    if (project.hasProperty('args')) {
-        args project.args.split(',')
-    }
-    systemProperties = System.properties
+// ----- Checkstyle -----
+checkstyle {
+    showViolations = false
+    toolVersion = "${checkstyleVersion}"
+    // checkstyle.xml copy from:
+    // https://raw.githubusercontent.com/checkstyle/checkstyle/checkstyle-8.6/src/main/resources/google_checks.xml
+    // the version should be as same as plugin version
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
 }
 
+
+// [checkstyleMain, checkstyleTest] {
+//     source = 'src/${sourceSet.name}/java'
+// }
+
+checkstyleMain {
+    source = 'src/main/java'
+    // source = 'src/${sourceSet.name}/${sourceSet.name.name}'
+    // sourceSets = [sourceSets.main.srcDirs]
+}
+
+checkstyleTest {
+    source = 'src/test/java'
+    // source = 'src/${sourceSet.name}/java'
+    // source = '${sourceSet.name.java.srcDir}'
+}
+
+
+// ----- PMD -----
+pmd {
+    consoleOutput = false
+    ignoreFailures = true       // Don't interrupt the build
+    toolVersion = "${pmdVersion}"
+    ruleSetFiles = files("${rootDir}/config/pmd/pmd.xml")
+    ruleSets = []
+}
+
+// --- Mutation Tests
+// pitest {
+//     verbose = false
+//     testSourceSets = [sourceSets.test]
+//     mainSourceSets = [sourceSets.main]
+//     // targetClasses = ['com.example.security.*']  //by default "${project.group}.*"
+//     pitestVersion = "${pitVersion}" //not needed when a default PIT version should be used
+//     threads = 4
+//     outputFormats = ['XML', 'HTML']
+//     timestampedReports = false
+//     withHistory = true
+//     // mutators = ['DEFAULTS', 'STRONGER', 'ALL']
+//     mutators = ['DEFAULTS', 'STRONGER' ]
+// }
+
+
+
+// ===== Documentation =====
+// asciidoctor {
+// 	sourceDir 'src/main/asciidoc'
+// 	attributes \
+// 		'snippets': file('target/snippets')
+//     // resources 'doc'
+// }
+
+// plantuml {
+//     sourcePath = 'doc'
+// }
