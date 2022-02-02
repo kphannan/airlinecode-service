@@ -33,20 +33,26 @@ public class PartnerServices
     @PostConstruct
     public void init()
     {
-        // Build out the transient elements....
-        soapServices.forEach(svc -> {
-            svc.uri = (svc.certificate == null ? "http://" : "https://") + svc.host + ":" + svc.port;
-        });
-
         System.out.println( "----- Examine the parter service list -----");
         // System.out.println(services);
         // System.out.println( something );
         // System.out.println( foo );
         System.out.println("   -- Services --");
-        services.forEach(System.out::println);
+        if ( null != services )
+        {
+            services.forEach(System.out::println);
+        }
 
         System.out.println("   -- SOAP Services --");
-        soapServices.forEach(System.out::println);
+        // Build out the transient elements....
+        if ( null != soapServices )
+        {
+            soapServices.forEach(svc -> {
+                svc.uri = (svc.certificate == null ? "http://" : "https://") + svc.host + ":" + svc.port;
+            });
+
+            soapServices.forEach(System.out::println);
+        }
 
         System.out.println("----- End of service configuration -----");
     }

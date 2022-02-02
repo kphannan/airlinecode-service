@@ -1,9 +1,11 @@
 pluginManagement {
+
 	repositories {
 		maven { url 'https://repo.spring.io/milestone' }
 		maven { url 'https://repo.spring.io/snapshot' }
 		gradlePluginPortal()
 	}
+
 	resolutionStrategy {
 		eachPlugin {
 			if (requested.id.id == 'org.springframework.boot') {
@@ -13,5 +15,4 @@ pluginManagement {
 	}
 }
 
-includeFlat 'core'
-
+includeFlat 'airline-core'
