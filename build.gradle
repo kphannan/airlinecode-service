@@ -27,6 +27,10 @@ buildscript {
         junitVersion               = '5.8.2'
         // --- Code coverage
         pitVersion                 = '1.7.3'
+        // --- BDD
+        // karateVersion              = '0.9.6'
+        karateVersion              = '1.1.0'
+
 
         // --- Documentation ---
         asciiDoctorVersion         = '1.5.6'
@@ -88,11 +92,11 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
+// configurations {
+//     compileOnly {
+//         extendsFrom annotationProcessor
+//     }
+// }
 
 repositories {
     mavenCentral()
@@ -165,6 +169,10 @@ dependencies {
     // --- Coverage
     // --- Mutation testing
     testRuntimeOnly( 'org.pitest:pitest-junit5-plugin:0.15' )
+    // --- BDD
+    testImplementation( "com.intuit.karate:karate-junit5:${karateVersion}" )
+    // integrationTestImplementation( "com.intuit.karate:karate-junit5:${karateVersion}" )
+    // testImplementation( "com.intuit.karate:karate-apache:${karateVersion}" )
     // --- Reporting
     // testImplementation( "net.serenity-bdd:serenity-core:${serenityVersion}" )
     // testImplementation( "net.serenity-bdd:serenity-junit:${serenityVersion}" )
@@ -180,14 +188,129 @@ dependencyManagement {
     }
 }
 
+
+// ===== Quality Assurance =====
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*.java'
+        }
+    }
+
+    integrationTest {
+        compileClasspath += sourceSets.main.output + sourceSets.test.output
+        runtimeClasspath += sourceSets.main.output + sourceSets.test.output
+
+        // java {
+        //     include = '**/*IT.java'
+        // }
+
+        resources {
+            srcDir file('src/integrationTest/features')
+            exclude '**/*.java'
+        }
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+
+	developmentOnly
+
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+
+    integrationTestImplementation.extendsFrom testImplementation
+}
+// --- Unit Test ---
+// sourceSets.test {
+//     resources {
+//         srcDir file('src/test/java')
+//         exclude '**/*.java'
+//     }
+// }
+
 test {
     outputs.dir snippetsDir
     useJUnitPlatform()
+
+    // pull karate options into the runtime
+    systemProperty "karate.options", System.properties.getProperty("karate.options")
+    // pull karate env into the runtime
+    systemProperty "karate.env", System.properties.getProperty("karate.env")
+    // ensure tests are always run
+    outputs.upToDateWhen { false }
+
+
 
     jacoco {
         excludes = [ '**/AirlineCodeApplication' ]
     }
 }
+
+// --- Integration test ---
+
+// sourceSets.integrationTest {
+//     compileClasspath += main.output + test.output
+//     runtimeClasspath += main.output + test.output
+//     resources {
+//         srcDir file('src/integrationTest/features')
+//         exclude '**/*.java'
+//     }
+// }
+
+tasks.register( 'integrationTest', Test ){
+    group 'Verification'
+    description 'runs the integration tests with Cucumber/Selenium/Karate'
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath       = sourceSets.integrationTest.runtimeClasspath
+
+    mustRunAfter test
+}
+
+// integrationTest {
+// 	useJUnitPlatform()
+//     // pull karate options into the runtime
+//     systemProperty "karate.options", System.properties.getProperty("karate.options")
+//     // pull karate env into the runtime
+//     systemProperty "karate.env", System.properties.getProperty("karate.env")
+//     // ensure tests are always run
+//     outputs.upToDateWhen { false }
+// }
+
+// --- Force unit tests to run first
+// integrationTest.dependsOn test
+
+// task integrationTest(type: Test) {
+//     group 'Verification'
+//     description 'runs the integration tests with Cucumber/Selenium/Karate'
+
+//     testClassesDirs = sourceSets.integrationTest.output.classesDirs
+//     classpath       = sourceSets.integrationTest.runtimeClasspath
+
+//     mustRunAfter test
+// }
+
+
+// integrationTest {
+// 	useJUnitPlatform()
+//     // pull karate options into the runtime
+//     systemProperty "karate.options", System.properties.getProperty("karate.options")
+//     // pull karate env into the runtime
+//     systemProperty "karate.env", System.properties.getProperty("karate.env")
+//     // ensure tests are always run
+//     outputs.upToDateWhen { false }
+// }
+
 
 // asciidoctor {
 //   inputs.dir snippetsDir
@@ -245,7 +368,7 @@ checkstyle {
 }
 
 
-// [checkstyleMain, checkstyleTest] {
+// [checkstyleMain, checkstyleTest].each {
 //     source = 'src/${sourceSet.name}/java'
 // }
 
