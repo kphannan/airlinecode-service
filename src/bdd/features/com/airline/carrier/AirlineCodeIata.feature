@@ -43,11 +43,6 @@ Scenario Outline: Add a new IATA airline code "<id>"
       And request {iataAirlineCode: "<id>" }
      When method POST
      Then status 201
-
-    # When method GET
-    # Then status 200
-    # And match $.iata_code == <id>
-    # And match $ == {"iataAirlineCode":"<id>"}
       And match $.iataAirlineCode == "<id>"
 
     Examples:

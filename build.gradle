@@ -181,9 +181,9 @@ sourceSets {
         }
     }
 
-    integrationTest {
+    bdd {
         resources {
-            srcDir file('src/integrationTest/features')
+            srcDir file('src/bdd/features')
             exclude '**/*.java'
         }
     }
@@ -204,7 +204,7 @@ configurations {
 		extendsFrom annotationProcessor
 	}
 
-    integrationTestImplementation.extendsFrom testImplementation
+    bddImplementation.extendsFrom testImplementation
 }
 
 test {
@@ -226,12 +226,12 @@ test {
 }
 
 // --- Integration test ---
-tasks.register( 'integrationTest', Test ){
+tasks.register( 'bdd', Test ){
     group 'Verification'
-    description 'runs the integration tests with Cucumber/Selenium/Karate'
+    description 'runs the behavior tests with Cucumber/Selenium/Karate'
 
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath       = sourceSets.integrationTest.runtimeClasspath
+    testClassesDirs = sourceSets.bdd.output.classesDirs
+    classpath       = sourceSets.bdd.runtimeClasspath
 
     // pull karate options into the runtime
     // systemProperty "karate.options", System.properties.getProperty( "karate.options" )
@@ -245,16 +245,7 @@ tasks.register( 'integrationTest', Test ){
 }
 
 // --- Force unit tests to run first
-// integrationTest.dependsOn test
-
-
-
-// asciidoctor {
-//   inputs.dir snippetsDir
-//   dependsOn test
-// }
-
-
+// bdd.dependsOn test
 
 
 
