@@ -1,46 +1,38 @@
 package com.airline.carrier.controller;
 
-import static org.assertj.core.api.Assertions.*;
-
-import static org.mockito.BDDMockito.*;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+// import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-
-
-
+import com.airline.carrier.repository.AirlineCodeIcao;
+import com.airline.carrier.repository.AirlineCodeIcaoRepository;
+import com.airline.core.carrier.ICAOAirlineDesignator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.airline.carrier.repository.AirlineCodeIcao;
-import com.airline.carrier.repository.AirlineCodeIcaoRepository;
-import com.airline.core.carrier.ICAOAirlineDesignator;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.http.*;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 
 @SpringBootTest
-public class AirlineCodeControllerIcaoTest
+class AirlineCodeControllerIcaoTest
 {
     // @Autowired
     private MockMvc   mvc;
@@ -53,9 +45,9 @@ public class AirlineCodeControllerIcaoTest
     AirlineCodeControllerIcao    service;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
-        mvc = MockMvcBuilders.standaloneSetup(service)
+        mvc = MockMvcBuilders.standaloneSetup( service )
                 // .setControllerAdvice(new SuperHeroExceptionHandler())
                 // .addFilters(new SuperHeroFilter())
                 .build();
@@ -63,56 +55,56 @@ public class AirlineCodeControllerIcaoTest
 
 
     @Test
-    public void getSingleKnownIcaoAirlineCode()
+    void getSingleKnownIcaoAirlineCode()
         throws Exception
     {
         final ICAOAirlineDesignator airlineCode = new ICAOAirlineDesignator( "LUH" );
         assertThat( airlineCode ).isNotNull();
 
-        given( repository.findById("LUH")).willReturn( Optional.of( new AirlineCodeIcao( airlineCode.getAirlineCode() )));
+        given( repository.findById( "LUH" ) ).willReturn( Optional.of( new AirlineCodeIcao( airlineCode.getAirlineCode() ) ) );
 
         final MockHttpServletResponse response = mvc.perform(
-            get("/airline/icao/{id}", airlineCode.getAirlineCode() )
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isOk() )
+            get( "/airline/icao/{id}", airlineCode.getAirlineCode() )
+                .accept( MediaType.APPLICATION_JSON ) )
+            .andExpect( status().isOk() )
             // .andExpect( jsonPath("$.icaoAirlineCode", equalTo( "LUH")))
             .andReturn().getResponse();
     }
 
 
     @Test
-    public void getSingleNotKnownIcaoAirlineCode()
+    void getSingleNotKnownIcaoAirlineCode()
         throws Exception
     {
-        given( repository.findById("KAL")).willReturn( Optional.ofNullable( null ));
+        given( repository.findById( "KAL" ) ).willReturn( Optional.ofNullable( null ) );
 
         final MockHttpServletResponse response = mvc.perform(
-            get("/airline/icao/{id}", "KAL" )
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isNotFound() )
+            get( "/airline/icao/{id}", "KAL" )
+                .accept( MediaType.APPLICATION_JSON ) )
+            .andExpect( status().isNotFound() )
             .andReturn().getResponse();
     }
 
 
 
     @Test
-    public void getAllAirlineCodesIsEmpty()
+    void getAllAirlineCodesIsEmpty()
         throws Exception
     {
-        given( repository.findAll()).willReturn( Collections.emptyList());
+        given( repository.findAll() ).willReturn( Collections.emptyList() );
 
         final MockHttpServletResponse response = mvc.perform(
-            get("/airline/icao" ))
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isOk() )
-            .andExpect(content().json("[]"))
+            get( "/airline/icao" ) )
+            .andDo( MockMvcResultHandlers.print() )
+            .andExpect( status().isOk() )
+            .andExpect( content().json( "[]" ) )
             .andReturn().getResponse();
     }
 
 
 
     @Test
-    public void getAllAirlineCodesHasOneEntry()
+    void getAllAirlineCodesHasOneEntry()
         throws Exception
     {
         final String[] codeStringList = { "SNB" };
@@ -121,15 +113,15 @@ public class AirlineCodeControllerIcaoTest
         List<AirlineCodeIcao> listOfIcaoAirlineCodes =
             Arrays.asList( codeStringList )
                   .stream()
-                  .map( a -> new AirlineCodeIcao( a ))
-                  .collect(Collectors.toList());
-        
-        given( repository.findAll()).willReturn( listOfIcaoAirlineCodes );
+                  .map( a -> new AirlineCodeIcao( a ) )
+                  .collect( Collectors.toList() );
+
+        given( repository.findAll() ).willReturn( listOfIcaoAirlineCodes );
 
         final MockHttpServletResponse response = mvc.perform(
-            get("/airline/icao" ))
-            .andExpect(status().isOk() )
-            .andExpect(content().json("[{icaoAirlineCode: \"SNB\"}]"))
+            get( "/airline/icao" ) )
+            .andExpect( status().isOk() )
+            .andExpect( content().json( "[{icaoAirlineCode: \"SNB\"}]" ) )
             // .andExpect( jsonPath("$.icaoAirlineCode", equalTo( "SNB")))
             .andReturn().getResponse();
     }
@@ -137,38 +129,38 @@ public class AirlineCodeControllerIcaoTest
 
 
     @Test
-    public void deleteKnownAirlineCode()
+    void deleteKnownAirlineCode()
         throws Exception
     {
         final String targetAirline = "DLH";
 
-        given( repository.findById(targetAirline)).willReturn( Optional.of( new AirlineCodeIcao( targetAirline )));
+        given( repository.findById( targetAirline ) ).willReturn( Optional.of( new AirlineCodeIcao( targetAirline ) ) );
 
         final MockHttpServletResponse response = mvc.perform(
-            delete("/airline/icao/{id}", targetAirline )
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isNoContent() )
+            delete( "/airline/icao/{id}", targetAirline )
+                .accept( MediaType.APPLICATION_JSON ) )
+            .andExpect( status().isNoContent() )
             .andReturn().getResponse();
     }
 
     @Test
-    public void deleteAnUnknownAirlineCode()
+    void deleteAnUnknownAirlineCode()
         throws Exception
     {
         final String targetAirline = "BAW";
 
-        given( repository.findById(targetAirline)).willReturn( Optional.ofNullable( null ));
+        given( repository.findById( targetAirline ) ).willReturn( Optional.ofNullable( null ) );
 
         final MockHttpServletResponse response = mvc.perform(
-            delete("/airline/icao/{id}", targetAirline )
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isNotFound() )
+            delete( "/airline/icao/{id}", targetAirline )
+                .accept( MediaType.APPLICATION_JSON ) )
+            .andExpect( status().isNotFound() )
             .andReturn().getResponse();
     }
 
 
     @Test
-    public void addNewIcaoAirlineCodeAFR()
+    void addNewIcaoAirlineCodeAFR()
         throws Exception
     {
         final ICAOAirlineDesignator airlineCode = new ICAOAirlineDesignator( "VIR" );
@@ -177,17 +169,17 @@ public class AirlineCodeControllerIcaoTest
         final String json = "{ \"icaoAirlineCode\": \"AFR\"}";
 
         AirlineCodeIcao       icao = new AirlineCodeIcao( "AFR" );
-        ICAOAirlineDesignator icaoAirlineCode = new ICAOAirlineDesignator("AFR");
+        ICAOAirlineDesignator icaoAirlineCode = new ICAOAirlineDesignator( "AFR" );
 
-        given( repository.save( icao )).willReturn( icao );
+        given( repository.save( icao ) ).willReturn( icao );
 
         final MockHttpServletResponse response = mvc.perform(
-            post("/airline/icao" )
+            post( "/airline/icao" )
                 // .content(icaoAirlineCode)
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isCreated() )
+                .content( json )
+                .contentType( MediaType.APPLICATION_JSON )
+                .accept( MediaType.APPLICATION_JSON ) )
+            .andExpect( status().isCreated() )
             // .andExpect( jsonPath("$.icaoAirlineCode", equalTo( "AFR")))
             .andReturn().getResponse();
     }
@@ -195,85 +187,79 @@ public class AirlineCodeControllerIcaoTest
 
 
     @Test
-    public void updateExistingAirlineCode()
+    void updateExistingAirlineCode()
         throws Exception
     {
         final String json = "{ \"icaoAirlineCode\": \"VIR\"}";
 
         AirlineCodeIcao icao = new AirlineCodeIcao( "VIR" );
-        ICAOAirlineDesignator icaoAirlineCode = new ICAOAirlineDesignator("VIR");
+        ICAOAirlineDesignator icaoAirlineCode = new ICAOAirlineDesignator( "VIR" );
 
-        given( repository.save( icao ))
+        given( repository.save( icao ) )
             .willReturn( icao );
-        given( repository.findById(icao.getIcaoCode()))
-            .willReturn( Optional.of( icao ));
+        given( repository.findById( icao.getIcaoCode() ) )
+            .willReturn( Optional.of( icao ) );
 
         final MockHttpServletResponse response = mvc.perform(
-            put("/airline/icao/{id}", icaoAirlineCode.getAirlineCode() )
+            put( "/airline/icao/{id}", icaoAirlineCode.getAirlineCode() )
                 // .content(icaoAirlineCode)
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isOk() )
+                .content( json )
+                .contentType( MediaType.APPLICATION_JSON )
+                .accept( MediaType.APPLICATION_JSON ) )
+            .andExpect( status().isOk() )
             // .andExpect( jsonPath("$.icaoAirlineCode", equalTo( "VIR")))
             .andReturn().getResponse();
     }
 
     @Test
-    public void updateNonExistingAirlineCodeIsReallyAnAdd()
+    void updateNonExistingAirlineCodeIsReallyAnAdd()
         throws Exception
     {
         final String json = "{ \"icaoAirlineCode\": \"VIR\"}";
 
         AirlineCodeIcao icao = new AirlineCodeIcao( "VIR" );
-        ICAOAirlineDesignator icaoAirlineCode = new ICAOAirlineDesignator("VIR");
+        ICAOAirlineDesignator icaoAirlineCode = new ICAOAirlineDesignator( "VIR" );
 
-        given( repository.findById(icao.getIcaoCode()))
-            .willReturn( Optional.ofNullable(null));
-        given( repository.save( icao ))
+        given( repository.findById( icao.getIcaoCode() ) )
+            .willReturn( Optional.ofNullable( null ) );
+        given( repository.save( icao ) )
             .willReturn( icao );
 
         final MockHttpServletResponse response = mvc.perform(
-            put("/airline/icao/{id}", icaoAirlineCode.getAirlineCode() )
+            put( "/airline/icao/{id}", icaoAirlineCode.getAirlineCode() )
                 // .content(icaoAirlineCode)
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isCreated() )
+                .content( json )
+                .contentType( MediaType.APPLICATION_JSON )
+                .accept( MediaType.APPLICATION_JSON ) )
+            .andExpect( status().isCreated() )
             // .andExpect( jsonPath("$.icaoAirlineCode", equalTo( "KATL")))
             .andReturn().getResponse();
     }
 
 
     @Test
-    public void updateAirlineCodeWrongKeyIsInvalid()
+    void updateAirlineCodeWrongKeyIsInvalid()
         throws Exception
     {
         final String json = "{ \"icaoAirlineCode\": \"VEX\"}";
 
         AirlineCodeIcao icao = new AirlineCodeIcao( "VIR" );
-        ICAOAirlineDesignator icaoAirlineCode = new ICAOAirlineDesignator("VIR");
+        ICAOAirlineDesignator icaoAirlineCode = new ICAOAirlineDesignator( "VIR" );
 
-        given( repository.findById(icao.getIcaoCode()))
-            .willReturn( Optional.ofNullable(null));
-        given( repository.save( icao ))
+        given( repository.findById( icao.getIcaoCode() ) )
+            .willReturn( Optional.ofNullable( null ) );
+        given( repository.save( icao ) )
             .willReturn( icao );
 
         final MockHttpServletResponse response = mvc.perform(
-            put("/airline/icao/{id}", icaoAirlineCode.getAirlineCode() )
+            put( "/airline/icao/{id}", icaoAirlineCode.getAirlineCode() )
                 // .content(icaoAirlineCode)
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept( MediaType.APPLICATION_JSON ))
-            .andExpect(status().isBadRequest() )
+                .content( json )
+                .contentType( MediaType.APPLICATION_JSON )
+                .accept( MediaType.APPLICATION_JSON ) )
+            .andExpect( status().isBadRequest() )
             // .andExpect( jsonPath("$.icaoAirlineCode", equalTo( "VIR")))
             .andReturn().getResponse();
     }
 
-
-
 }
-
- 
- 
- 

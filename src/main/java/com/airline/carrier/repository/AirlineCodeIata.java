@@ -4,9 +4,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import lombok.Data;
 
+/**
+ * Declaration of a persistence entity.
+ */
 @Entity
 @Table( name = "IATA_AIRLINECODE" )
 @Data

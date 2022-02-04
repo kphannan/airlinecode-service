@@ -2,9 +2,6 @@ package com.airline.carrier;
 
 import com.intuit.karate.junit5.Karate;
 
-// import lombok.extern.log4j.Log4j2;
-
-
 /**
  * Main BDD test runner.
  */
@@ -22,7 +19,7 @@ public class KarateRunnerIT
         // log.info( "Run Karate BDD Tests" );
         // System.out.println( "Run Karate BDD Tests" );
 
-        return new Karate().relativeTo( getClass() );
+        return new Karate().run().relativeTo( getClass() );
     }
 
 }
